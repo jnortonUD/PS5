@@ -101,6 +101,7 @@ public class XMLXPath {
 					DateFormat lFormatter = new SimpleDateFormat("yyyy-mm-dd");
 
 					Book b = new Book(eElement.getAttribute("id"),
+							Double.parseDouble(eElement.getElementsByTagName("Cost").item(0).getTextContent()),
 							eElement.getElementsByTagName("author").item(0).getTextContent(),
 							eElement.getElementsByTagName("title").item(0).getTextContent(),
 							eElement.getElementsByTagName("genre").item(0).getTextContent(),

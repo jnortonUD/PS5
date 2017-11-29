@@ -1,12 +1,14 @@
 package pkgMain;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import pkgException.BookException;
 import pkgLibrary.Book;
 import pkgLibrary.Catalog;
 
@@ -22,15 +24,25 @@ public class XMLReader {
 		//	Increase the price of each book
 		IncreasePrice(cat,0.10);
 		
+		//Set initial cost at 80% of price
+		SetCost(cat,0.80);
+		
 		//	Write the XML file from 'cat' object
 		WriteXMLFile(cat);
 		
 	}
 
 
+	private static Catalog SetCost(Catalog cat,double cost) {
+		//Set initial cost
+		for (Book b : cat.getBooks()) {
+			double newCost = (b.getPrice() * cost);			
+			b.setPrice(Math.round(newCost * 100.0) / 100.0);
+		}
+		return cat;
+	}
 	
-	
-	private static Catalog ReadCatalog() {
+	public static Catalog ReadCatalog() {
 		Catalog cat = ReadXMLFile();
 		
 		System.out.println("cat ID " + cat.getId());
@@ -39,6 +51,44 @@ public class XMLReader {
 		return cat;		
 	}
 
+	public static Book getBook(String id) throws BookException{
+		Catalog cat = ReadCatalog();
+		int i = 0;
+		Book Book1 = null;
+		
+		for(Book b : cat.getBooks()) {
+			if(b.getId() == id) {
+				i++;
+				Book1 = b;
+			}
+		}
+		if(i == 0) {
+			throw new BookException("This book doesn't exist");
+		}
+		else {
+			return Book1;
+		}
+	}
+	
+	public static void AddBook(int CatalogID, Book d) throws BookException{
+		Catalog cat = ReadCatalog();
+		cat.setId(CatalogID);
+		int i = 0;
+		
+		for (Book b : cat.getBooks()) {
+			if (b.getId() == d.getId()) {
+				i++;
+				throw new BookException("This book is already in the catalog");
+			}
+		}
+		if(i == 0) {
+			ArrayList<Book> Books = cat.getBooks();
+			Books.add(d);
+			cat.setBooks(Books);
+			WriteXMLFile(cat);
+		}	
+	}
+	
 	private static Catalog IncreasePrice(Catalog cat, double PriceIncrease)
 	{
 		for (Book b : cat.getBooks()) {
